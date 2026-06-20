@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>買い時通知 | Kaimono Clock</title>
+    <meta name="description" content="購入頻度と割引情報を照合し、必要なものだけを安く買えるタイミングで通知する機能。" />
+    <link rel="stylesheet" href="./styles_ver2.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index_ver2.html" aria-label="Kaimono Clock トップへ">
+        <span class="brand-mark">K</span>
+        <span>Kaimono Clock</span>
+      </a>
+      <nav class="nav-links" aria-label="主要ナビゲーション">
+        <a href="./index_ver2.html">ホーム</a>
+        <a href="./budget.html">家計簿</a>
+        <a href="./map.html">地図</a>
+        <a aria-current="page" href="./alerts.html">通知</a>
+        <a href="./items.html">買い物例</a>
+      </nav>
+      <a class="header-cta app-cta" href="./app.html">アプリを体験</a>
+    </header>
+
+    <main class="page-shell">
+      <section class="split-section">
+        <div>
+          <p class="eyebrow">Alert page</p>
+          <h1>
+            <span>安いだけでは、</span>
+            <span>通知しない。</span>
+          </h1>
+          <p class="lead">
+            Kaimono Clockは、購入ペースから「そろそろ必要」を予測してから、近くのお店の割引と照合します。
+            まだ家にあるものや、今月の予算に合わないものは優先度を下げます。
+          </p>
+          <ul class="feature-list" aria-label="通知機能の特徴">
+            <li>なくなりそうな日を予測</li>
+            <li>割引情報と照合</li>
+            <li>予算に合わせて優先度を調整</li>
+          </ul>
+          <div class="hero-actions">
+            <a class="primary-btn app-cta" href="./app.html">アプリを体験してみる</a>
+            <a class="secondary-btn" href="./items.html">買い物例を見る</a>
+          </div>
+          <div class="student-context" aria-label="学生生活で使う場面">
+            <span>放課後17:30に通知</span>
+            <span>必要なものだけ表示</span>
+            <span>安い日を逃さない</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="alert-list">
+            <article class="alert-item urgent">
+              <h3>今日 17:30 / 冷凍パスタ</h3>
+              <p>明日の朝食用に必要。駅前ドラッグで本日19時まで30円OFF。</p>
+            </article>
+            <article class="alert-item">
+              <h3>明日 / コンタクト洗浄液</h3>
+              <p>あと2日で切れそう。キャンパス前薬局の割引が継続中。</p>
+            </article>
+            <article class="alert-item">
+              <h3>週末 / パックご飯</h3>
+              <p>今週は食費が高めなので、まとめ買いではなく必要分だけ提案。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-kicker">Decision</p>
+        <h2>通知の基準を3つに分けて整理。</h2>
+        <div class="page-grid">
+          <article class="page-card">
+            <strong>Need</strong>
+            <h3>必要度</h3>
+            <p>購入頻度から、いつなくなりそうかを見積もります。</p>
+          </article>
+          <article class="page-card">
+            <strong>Deal</strong>
+            <h3>割引</h3>
+            <p>近くのお店のセールと価格を比較します。</p>
+          </article>
+          <article class="page-card">
+            <strong>Route</strong>
+            <h3>寄りやすさ</h3>
+            <p>学校、駅、家からの距離と時間を見ます。</p>
+          </article>
+          <article class="page-card">
+            <strong>Budget</strong>
+            <h3>予算</h3>
+            <p>今月あと使える金額に合わせて通知量を調整します。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Kaimono Clock</span>
+      <span><a href="./items.html">次は買い物例を見る</a></span>
+    </footer>
+  </body>
+</html>
