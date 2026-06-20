@@ -1,0 +1,45 @@
+{
+  "sample-supermarket-1": [
+    {
+      "id": "sample-note-milk",
+      "storeName": "駅前サンプルスーパー",
+      "storeType": "supermarket",
+      "name": "牛乳 1000ml",
+      "price": 138,
+      "saleMode": "weekly",
+      "saleDate": "",
+      "saleWeekday": "2",
+      "saleMonthDay": "",
+      "note": "朝食用。2本まで",
+      "createdAt": "2026/6/16"
+    },
+    {
+      "id": "sample-note-rice",
+      "storeName": "駅前サンプルスーパー",
+      "storeType": "supermarket",
+      "name": "パックご飯 5食",
+      "price": 498,
+      "saleMode": "monthly",
+      "saleDate": "",
+      "saleWeekday": "0",
+      "saleMonthDay": "10",
+      "note": "テスト期間用にストック",
+      "createdAt": "2026/6/16"
+    }
+  ],
+  "sample-drugstore-1": [
+    {
+      "id": "sample-note-contact",
+      "storeName": "サンプルドラッグ中央店",
+      "storeType": "drugstore",
+      "name": "コンタクト洗浄液",
+      "price": 472,
+      "saleMode": "once",
+      "saleDate": "2026-06-25",
+      "saleWeekday": "0",
+      "saleMonthDay": "",
+      "note": "なくなる前に買う",
+      "createdAt": "2026/6/16"
+    }
+  ]
+}
