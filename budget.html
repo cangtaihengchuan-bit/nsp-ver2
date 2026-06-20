@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>家計簿機能 | Kaimono Clock</title>
+    <meta name="description" content="学生のバイト代、仕送り、食費、日用品、サブスクをまとめて管理する家計簿機能。" />
+    <link rel="stylesheet" href="./styles_ver2.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index_ver2.html" aria-label="Kaimono Clock トップへ">
+        <span class="brand-mark">K</span>
+        <span>Kaimono Clock</span>
+      </a>
+      <nav class="nav-links" aria-label="主要ナビゲーション">
+        <a href="./index_ver2.html">ホーム</a>
+        <a aria-current="page" href="./budget.html">家計簿</a>
+        <a href="./map.html">地図</a>
+        <a href="./alerts.html">通知</a>
+        <a href="./items.html">買い物例</a>
+      </nav>
+      <a class="header-cta app-cta" href="./app.html">アプリを体験</a>
+    </header>
+
+    <main class="page-shell">
+      <section class="split-section">
+        <div>
+          <p class="eyebrow">Budget page</p>
+          <h1>
+            <span>家計簿は、</span>
+            <span>今月の作戦ボード。</span>
+          </h1>
+          <p class="lead">
+            バイト代、仕送り、お小遣い、食費、日用品、サブスクをまとめて確認。
+            「今週あといくら使えるか」がすぐ分かるので、買い物の判断が軽くなります。
+          </p>
+          <ul class="feature-list" aria-label="家計簿機能の特徴">
+            <li>残り予算を表示</li>
+            <li>支出カテゴリを自動整理</li>
+            <li>買い時で節約した額を記録</li>
+          </ul>
+          <div class="hero-actions">
+            <a class="primary-btn app-cta" href="./app.html">アプリを体験してみる</a>
+            <a class="secondary-btn" href="./map.html">近くの店を検索できる</a>
+          </div>
+          <div class="student-context" aria-label="学生生活で使う場面">
+            <span>仕送り前の残高確認</span>
+            <span>食費の使いすぎ防止</span>
+            <span>サブスクの見直し</span>
+          </div>
+        </div>
+
+        <div class="dashboard-panel">
+          <div class="dashboard-row total">
+            <span>今月あと使える金額</span>
+            <strong>¥18,400</strong>
+          </div>
+          <div class="dashboard-row">
+            <span>食費</span>
+            <div class="bar food"><span style="width: 66%"></span></div>
+            <strong>66%</strong>
+          </div>
+          <div class="dashboard-row">
+            <span>日用品・学校</span>
+            <div class="bar life"><span style="width: 42%"></span></div>
+            <strong>42%</strong>
+          </div>
+          <div class="dashboard-row">
+            <span>サブスク</span>
+            <div class="bar"><span style="width: 28%"></span></div>
+            <strong>28%</strong>
+          </div>
+          <div class="dashboard-row saving">
+            <span>今月の買い時セーブ</span>
+            <strong>¥2,180</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-kicker">Use cases</p>
+        <h2>「使ったあと」ではなく「使う前」に分かる。</h2>
+        <div class="page-grid">
+          <article class="page-card">
+            <strong>食費</strong>
+            <h3>外食と自炊のバランス</h3>
+            <p>外食が続いた週は、自炊向けの買い時通知を優先して表示します。</p>
+          </article>
+          <article class="page-card">
+            <strong>日用品</strong>
+            <h3>まとめ買いの判断</h3>
+            <p>洗剤やコンタクト用品など、安い日に買うと効くものを見える化します。</p>
+          </article>
+          <article class="page-card">
+            <strong>固定費</strong>
+            <h3>サブスクも含める</h3>
+            <p>毎月の固定費を入れることで、自由に使える金額を現実的に表示します。</p>
+          </article>
+          <article class="page-card">
+            <strong>節約</strong>
+            <h3>成果が見える</h3>
+            <p>買い時を使って浮いた金額を残し、モチベーションにつなげます。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Kaimono Clock</span>
+      <span><a href="./map.html">次は地図機能を見る</a></span>
+    </footer>
+  </body>
+</html>
