@@ -1040,7 +1040,7 @@
       const SUPABASE_URL = "https://wnxphjricowzxbkwnmjx.supabase.co";
       const SUPABASE_ANON_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndueHBoanJpY293enhia3dubWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MDk5ODMsImV4cCI6MjA5NzQ4NTk4M30.p6lu6gNpdkTg0Nvnxj05m2tHbYeihYP7jFPdIEWfSxo";
-      const SUPABASE_TABLE = "store_discounts";
+      const SUPABASE_TABLE = "nsp_user_discounts";
       const SESSION_KEY = "kaimono-clock-session-v2";
 
       const state = {
@@ -1264,6 +1264,7 @@
       function noteToRow(storeId, note) {
         return {
           id: note.id,
+          user_id: state.user.id,
           store_id: storeId,
           store_name: note.storeName,
           store_type: note.storeType,
