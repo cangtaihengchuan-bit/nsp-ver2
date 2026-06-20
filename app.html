@@ -61,6 +61,7 @@
 
       .hero,
       .status,
+      .auth-panel,
       .stores,
       .workspace,
       .metric-card,
@@ -248,6 +249,60 @@
         display: flex;
         align-items: center;
         gap: 9px;
+      }
+
+      .auth-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 14px;
+        padding: 18px;
+      }
+
+      .auth-copy {
+        display: grid;
+        gap: 4px;
+      }
+
+      .auth-copy h2 {
+        margin: 0;
+        font-size: 1.15rem;
+      }
+
+      .auth-copy p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+        font-weight: 750;
+        line-height: 1.55;
+      }
+
+      .auth-form {
+        display: grid;
+        grid-template-columns: minmax(170px, 1fr) minmax(150px, 0.9fr) auto auto;
+        gap: 10px;
+        align-items: end;
+      }
+
+      .auth-session {
+        display: none;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        font-weight: 900;
+      }
+
+      .auth-panel.signed-in .auth-form {
+        display: none;
+      }
+
+      .auth-panel.signed-in .auth-session {
+        display: flex;
+      }
+
+      .auth-user {
+        color: #d85e49;
       }
 
       .dot {
@@ -666,6 +721,7 @@
 
       .hero,
       .status,
+      .auth-panel,
       .stores,
       .workspace,
       .metric-card,
@@ -751,6 +807,16 @@
       @media (max-width: 980px) {
         .hero {
           grid-template-columns: 1fr;
+        }
+
+        .auth-panel,
+        .auth-form {
+          grid-template-columns: 1fr;
+        }
+
+        .auth-session {
+          justify-content: flex-start;
+          flex-wrap: wrap;
         }
       }
 
@@ -841,6 +907,29 @@
           <span id="statusText">位置情報を許可すると、近くのスーパーとドラッグストアから買い時候補を探します。</span>
         </div>
         <button id="clearAllBtn" class="btn btn-ghost" type="button">保存メモを全削除</button>
+      </section>
+
+      <section id="authPanel" class="auth-panel" aria-label="ログイン">
+        <div class="auth-copy">
+          <h2>ログインして自分だけの割引メモを保存</h2>
+          <p>メールアドレスとパスワードでログインすると、保存した割引情報は他のユーザーから見えません。</p>
+        </div>
+        <form id="authForm" class="auth-form">
+          <label>
+            メールアドレス
+            <input id="authEmail" type="email" autocomplete="email" placeholder="student@example.com" required />
+          </label>
+          <label>
+            パスワード
+            <input id="authPassword" type="password" autocomplete="current-password" placeholder="8文字以上" required />
+          </label>
+          <button id="loginBtn" class="btn btn-primary" type="submit">ログイン</button>
+          <button id="signupBtn" class="btn btn-ghost" type="button">新規作成</button>
+        </form>
+        <div class="auth-session">
+          <span class="auth-user" id="authUser">未ログイン</span>
+          <button id="logoutBtn" class="btn btn-ghost" type="button">ログアウト</button>
+        </div>
       </section>
 
       <section class="summary-grid" aria-label="概要">
@@ -952,6 +1041,7 @@
       const SUPABASE_ANON_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndueHBoanJpY293enhia3dubWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MDk5ODMsImV4cCI6MjA5NzQ4NTk4M30.p6lu6gNpdkTg0Nvnxj05m2tHbYeihYP7jFPdIEWfSxo";
       const SUPABASE_TABLE = "store_discounts";
+      const SESSION_KEY = "kaimono-clock-session-v2";
 
       const state = {
         stores: [],
@@ -959,6 +1049,8 @@
         filter: "all",
         userPosition: null,
         notes: {},
+        session: null,
+        user: null,
       };
 
       const sampleStores = [
@@ -1023,6 +1115,13 @@
         saleMonthDay: document.querySelector("#saleMonthDay"),
         itemNote: document.querySelector("#itemNote"),
         notes: document.querySelector("#notes"),
+        authPanel: document.querySelector("#authPanel"),
+        authForm: document.querySelector("#authForm"),
+        authEmail: document.querySelector("#authEmail"),
+        authPassword: document.querySelector("#authPassword"),
+        signupBtn: document.querySelector("#signupBtn"),
+        logoutBtn: document.querySelector("#logoutBtn"),
+        authUser: document.querySelector("#authUser"),
       };
 
       function setStatus(mode, message) {
@@ -1034,10 +1133,15 @@
         return state.notes;
       }
 
+      function hasSession() {
+        return Boolean(state.session?.access_token && state.user?.id);
+      }
+
       function supabaseHeaders(extra = {}) {
+        const token = state.session?.access_token || SUPABASE_ANON_KEY;
         return {
           apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           ...extra,
         };
@@ -1054,6 +1158,91 @@
         }
         if (response.status === 204) return null;
         return response.json();
+      }
+
+      async function authRequest(path, body) {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error_description || data.msg || data.message || "Auth request failed");
+        }
+        return data;
+      }
+
+      function saveSession(session) {
+        state.session = session?.access_token ? session : null;
+        state.user = session?.user || null;
+        if (state.session) {
+          localStorage.setItem(SESSION_KEY, JSON.stringify(state.session));
+        } else {
+          localStorage.removeItem(SESSION_KEY);
+        }
+        renderAuth();
+      }
+
+      function restoreSession() {
+        try {
+          const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+          if (session?.access_token && session?.user) {
+            state.session = session;
+            state.user = session.user;
+          }
+        } catch {
+          localStorage.removeItem(SESSION_KEY);
+        }
+        renderAuth();
+      }
+
+      function renderAuth() {
+        elements.authPanel.classList.toggle("signed-in", hasSession());
+        elements.authUser.textContent = hasSession() ? state.user.email : "未ログイン";
+        elements.itemForm.querySelector("button[type='submit']").disabled = !hasSession();
+        elements.clearAllBtn.disabled = !hasSession();
+      }
+
+      async function signIn(email, password) {
+        const data = await authRequest("token?grant_type=password", { email, password });
+        saveSession(data);
+        await loadNotesFromSupabase();
+        await migrateLocalBackupIfEmpty();
+        render();
+        setStatus("ready", "ログインしました。保存済みの割引情報を読み込みました。");
+      }
+
+      async function signUp(email, password) {
+        const data = await authRequest("signup", { email, password });
+        if (data.access_token) {
+          saveSession(data);
+          await loadNotesFromSupabase();
+          await migrateLocalBackupIfEmpty();
+          render();
+          setStatus("ready", "アカウントを作成し、ログインしました。");
+          return;
+        }
+        setStatus("ready", "アカウントを作成しました。メール確認を無効にしている場合は、そのままログインできます。");
+      }
+
+      async function signOut() {
+        if (state.session?.access_token) {
+          await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+            method: "POST",
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${state.session.access_token}`,
+            },
+          }).catch(() => null);
+        }
+        saveSession(null);
+        state.notes = {};
+        render();
+        setStatus("ready", "ログアウトしました。割引メモを使うにはログインしてください。");
       }
 
       function rowToNote(row) {
@@ -1101,12 +1290,18 @@
       }
 
       async function loadNotesFromSupabase() {
+        if (!hasSession()) {
+          state.notes = {};
+          setStatus("ready", "ログインすると、自分だけの割引情報を保存・表示できます。");
+          return;
+        }
         const rows = await supabaseRequest(`${SUPABASE_TABLE}?select=*&order=created_at.desc`);
         state.notes = groupRows(rows || []);
         setStatus("ready", "Supabaseから保存済みの割引情報を読み込みました。");
       }
 
       async function migrateLocalBackupIfEmpty() {
+        if (!hasSession()) return;
         if (Object.values(state.notes).flat().length) return;
         try {
           const response = await fetch("./discounts.json", { cache: "no-store" });
@@ -1439,8 +1634,35 @@
         });
       });
 
+      elements.authForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          await signIn(elements.authEmail.value.trim(), elements.authPassword.value);
+          elements.authPassword.value = "";
+        } catch {
+          setStatus("error", "ログインできませんでした。メールアドレスとパスワードを確認してください。");
+        }
+      });
+
+      elements.signupBtn.addEventListener("click", async () => {
+        try {
+          await signUp(elements.authEmail.value.trim(), elements.authPassword.value);
+          elements.authPassword.value = "";
+        } catch {
+          setStatus("error", "アカウント作成に失敗しました。SupabaseのAuth設定を確認してください。");
+        }
+      });
+
+      elements.logoutBtn.addEventListener("click", async () => {
+        await signOut();
+      });
+
       elements.itemForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+        if (!hasSession()) {
+          setStatus("error", "割引情報を保存するにはログインしてください。");
+          return;
+        }
         const store = state.stores.find((item) => item.id === state.selectedStoreId);
         if (!store) return;
 
@@ -1475,6 +1697,10 @@
       });
 
       elements.clearAllBtn.addEventListener("click", async () => {
+        if (!hasSession()) {
+          setStatus("error", "割引情報を削除するにはログインしてください。");
+          return;
+        }
         state.notes = {};
         render();
         try {
@@ -1486,14 +1712,21 @@
       });
 
       async function initializeApp() {
-        try {
-          await loadNotesFromSupabase();
-          await migrateLocalBackupIfEmpty();
-        } catch {
+        restoreSession();
+        if (hasSession()) {
+          try {
+            await loadNotesFromSupabase();
+            await migrateLocalBackupIfEmpty();
+          } catch {
+            state.notes = {};
+            setStatus("error", "Supabaseから読み込めませんでした。supabase_user_auth_schema.sql を実行済みか確認してください。");
+          }
+        } else {
           state.notes = {};
-          setStatus("error", "Supabaseから読み込めませんでした。supabase_schema.sql を実行済みか確認してください。");
+          setStatus("ready", "ログインすると、自分だけの割引情報を保存・表示できます。");
         }
         syncScheduleFields();
+        renderAuth();
         render();
       }
 
