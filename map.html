@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>地図機能 | Kaimono Clock</title>
+    <meta name="description" content="学校、駅、家の近くのお店を地図で比較し、寄り道しやすい買い物ルートを見つける機能。" />
+    <link rel="stylesheet" href="./styles_ver2.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index_ver2.html" aria-label="Kaimono Clock トップへ">
+        <span class="brand-mark">K</span>
+        <span>Kaimono Clock</span>
+      </a>
+      <nav class="nav-links" aria-label="主要ナビゲーション">
+        <a href="./index_ver2.html">ホーム</a>
+        <a href="./budget.html">家計簿</a>
+        <a aria-current="page" href="./map.html">地図</a>
+        <a href="./alerts.html">通知</a>
+        <a href="./items.html">買い物例</a>
+      </nav>
+      <a class="header-cta app-cta" href="./app.html">アプリを体験</a>
+    </header>
+
+    <main class="page-shell">
+      <section class="split-section">
+        <div>
+          <p class="eyebrow">Map page</p>
+          <h1>
+            <span>帰り道で、</span>
+            <span>安い店に寄れる。</span>
+          </h1>
+          <p class="lead">
+            学校、駅、家の近くにあるスーパー、コンビニ、ドラッグストアを地図で比較。
+            距離だけでなく、閉店時間やセール終了時間も見て、寄りやすい順に提案します。
+          </p>
+          <ul class="feature-list" aria-label="地図機能の特徴">
+            <li>学校・駅・家を登録</li>
+            <li>セール終了時間を表示</li>
+            <li>寄り道ルートを比較</li>
+          </ul>
+          <div class="hero-actions">
+            <a class="primary-btn app-cta" href="./app.html">アプリを体験してみる</a>
+            <a class="secondary-btn" href="./alerts.html">買い時通知機能</a>
+          </div>
+          <div class="student-context" aria-label="学生生活で使う場面">
+            <span>学校帰りのルート</span>
+            <span>駅前ドラッグストア</span>
+            <span>自宅近くのスーパー</span>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div class="map-canvas" aria-label="地図機能のイメージ">
+            <div class="route-line"></div>
+            <div class="map-pin one">
+              <strong>学校</strong>
+              <span>現在地から徒歩4分</span>
+            </div>
+            <div class="map-pin two">
+              <strong>駅前ドラッグ</strong>
+              <span>冷凍食品 30円OFF</span>
+            </div>
+            <div class="map-pin three">
+              <strong>キャンパス前薬局</strong>
+              <span>洗浄液 ¥498</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-kicker">Route logic</p>
+        <h2>「近い」だけでなく「寄れる」を優先。</h2>
+        <div class="stat-grid">
+          <div class="stat">
+            <strong>徒歩7分</strong>
+            <span>学校帰りに寄れる範囲</span>
+          </div>
+          <div class="stat">
+            <strong>19:00</strong>
+            <span>セール終了時間を考慮</span>
+          </div>
+          <div class="stat">
+            <strong>3店舗</strong>
+            <span>候補を比較して表示</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Kaimono Clock</span>
+      <span><a href="./alerts.html">次は通知機能を見る</a></span>
+    </footer>
+  </body>
+</html>
