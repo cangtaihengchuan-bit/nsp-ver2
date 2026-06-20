@@ -1,0 +1,1504 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kaimono Clock | 学生のための買い時メモアプリ</title>
+    <meta
+      name="description"
+      content="バイト代や仕送りをムダ買いで減らさない。現在地の近くにあるスーパーとドラッグストアを取得し、店舗ごとに品物の価格とセール日を保存できる学生向けアプリ。"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17211f;
+        --muted: #63716e;
+        --paper: #f6faf7;
+        --surface: #ffffff;
+        --surface-soft: #f9fbfa;
+        --line: #dce6e1;
+        --mint: #16a985;
+        --mint-dark: #08755f;
+        --sky: #2c7be5;
+        --coral: #ff765d;
+        --lemon: #f4c542;
+        --navy: #17213c;
+        --shadow: 0 18px 46px rgba(23, 33, 60, 0.12);
+        font-family: "Segoe UI", "Noto Sans JP", system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(248, 251, 247, 0.8), rgba(248, 251, 247, 0.97)),
+          url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=2000&q=78") center /
+            cover fixed;
+        overflow-x: hidden;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app {
+        width: min(1180px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 22px 0 30px;
+      }
+
+      .hero,
+      .status,
+      .stores,
+      .workspace,
+      .metric-card,
+      .note-card {
+        border: 1px solid rgba(220, 230, 225, 0.9);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+      }
+
+      .hero {
+        min-height: 214px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: end;
+        padding: 26px;
+      }
+
+      .hero > div {
+        min-width: 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--mint-dark);
+        font-weight: 900;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(140deg, var(--mint), var(--sky));
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 14px 0 12px;
+        font-size: clamp(2rem, 5vw, 4.4rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+      }
+
+      h1 span {
+        display: block;
+      }
+
+      .lead {
+        max-width: 720px;
+        margin-bottom: 0;
+        color: #34443f;
+        line-height: 1.85;
+        overflow-wrap: anywhere;
+      }
+
+      .lead span {
+        display: block;
+      }
+
+      .proof-list {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+        margin: 18px 0 0;
+        padding: 0;
+      }
+
+      .proof-list div {
+        min-width: 132px;
+        padding: 12px;
+        border: 1px solid rgba(220, 230, 225, 0.9);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.76);
+      }
+
+      .proof-list dt {
+        color: var(--mint-dark);
+        font-size: 1.35rem;
+        font-weight: 950;
+      }
+
+      .proof-list dd {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 850;
+      }
+
+      .hero-controls {
+        min-width: min(100%, 360px);
+        display: grid;
+        gap: 10px;
+      }
+
+      .control-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      select,
+      input,
+      textarea {
+        width: 100%;
+        min-height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 0 12px;
+        outline: none;
+      }
+
+      textarea {
+        min-height: 80px;
+        padding-top: 10px;
+        resize: vertical;
+      }
+
+      select:focus,
+      input:focus,
+      textarea:focus {
+        border-color: var(--mint);
+        box-shadow: 0 0 0 3px rgba(22, 169, 133, 0.14);
+      }
+
+      .btn {
+        min-height: 44px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 0 14px;
+        font-weight: 900;
+      }
+
+      .btn-primary {
+        color: #fff;
+        background: var(--mint-dark);
+      }
+
+      .btn-primary:hover {
+        background: #075f50;
+      }
+
+      .btn-ghost {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.86);
+        border-color: var(--line);
+      }
+
+      .status {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 14px 0;
+        padding: 13px 16px;
+        color: var(--muted);
+      }
+
+      .status-message {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        flex: 0 0 10px;
+        border-radius: 50%;
+        background: #98a29f;
+      }
+
+      .dot.loading {
+        background: var(--lemon);
+      }
+
+      .dot.ready {
+        background: var(--mint);
+      }
+
+      .dot.error {
+        background: var(--coral);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .metric-card {
+        min-height: 96px;
+        padding: 16px;
+      }
+
+      .metric-card span {
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-weight: 850;
+      }
+
+      .metric-card strong {
+        display: block;
+        margin-top: 8px;
+        color: var(--mint-dark);
+        font-size: 1.65rem;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: minmax(290px, 380px) 1fr;
+        gap: 14px;
+      }
+
+      .stores,
+      .workspace {
+        min-height: 640px;
+      }
+
+      .stores {
+        padding: 18px;
+      }
+
+      .panel-head,
+      .detail-head,
+      .note-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .panel-head h2,
+      .detail-head h2 {
+        margin-bottom: 4px;
+      }
+
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        margin: 14px 0;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .chip {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface-soft);
+        color: var(--muted);
+        padding: 0 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .chip.active {
+        color: var(--mint-dark);
+        border-color: rgba(22, 169, 133, 0.5);
+        background: #e5f8f2;
+      }
+
+      .store-list {
+        display: grid;
+        gap: 10px;
+        max-height: 532px;
+        overflow: auto;
+        padding-right: 3px;
+      }
+
+      .store-card {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 13px;
+        text-align: left;
+      }
+
+      .store-card:hover,
+      .store-card.active {
+        border-color: var(--mint);
+        box-shadow: 0 10px 22px rgba(22, 169, 133, 0.13);
+      }
+
+      .store-card strong {
+        display: block;
+        margin: 8px 0 4px;
+        font-size: 1.02rem;
+      }
+
+      .store-card small,
+      .muted {
+        color: var(--muted);
+      }
+
+      .type-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        border-radius: 999px;
+        padding: 0 10px;
+        color: var(--mint-dark);
+        background: #e5f8f2;
+        font-size: 0.78rem;
+        font-weight: 900;
+      }
+
+      .type-pill.drugstore {
+        color: #245b9e;
+        background: #eaf3ff;
+      }
+
+      .workspace {
+        padding: 22px;
+      }
+
+      .empty {
+        min-height: 580px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .empty div {
+        max-width: 430px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .detail-head {
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .detail-head h2 {
+        font-size: clamp(1.55rem, 3vw, 2.4rem);
+        letter-spacing: 0;
+      }
+
+      .item-form {
+        display: grid;
+        grid-template-columns: minmax(170px, 1.1fr) 122px minmax(260px, 1.25fr) minmax(170px, 1fr) auto;
+        gap: 10px;
+        align-items: end;
+        margin: 18px 0;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+      }
+
+      .sale-field {
+        min-width: 0;
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .sale-field legend {
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-weight: 800;
+        padding: 0;
+      }
+
+      .sale-options {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .schedule-label {
+        display: grid;
+        gap: 5px;
+      }
+
+      .schedule-label span {
+        color: var(--muted);
+        font-size: 0.76rem;
+        font-weight: 850;
+      }
+
+      .schedule-field.hidden {
+        display: none;
+      }
+
+      .schedule-label.hidden {
+        display: none;
+      }
+
+      .notes {
+        display: grid;
+        gap: 10px;
+      }
+
+      .note-card {
+        padding: 14px;
+        box-shadow: none;
+      }
+
+      .note-head h3 {
+        margin-bottom: 5px;
+      }
+
+      .price {
+        color: var(--coral);
+        font-size: 1.35rem;
+        font-weight: 950;
+        white-space: nowrap;
+      }
+
+      .note-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .note-meta span {
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        background: #fff5d7;
+        color: #8b650d;
+        padding: 0 10px;
+        font-size: 0.84rem;
+        font-weight: 850;
+      }
+
+      .delete-btn {
+        min-height: 34px;
+        border: 1px solid #ffd6cc;
+        border-radius: 8px;
+        background: #fff4f1;
+        color: #b7442d;
+        font-weight: 900;
+      }
+
+      .blank-row {
+        padding: 28px;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        text-align: center;
+        background: rgba(255, 255, 255, 0.65);
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .summary-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .stores,
+        .workspace {
+          min-height: auto;
+        }
+
+        .store-list {
+          max-height: 360px;
+        }
+
+        .item-form {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .item-form button {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .app {
+          width: min(100% - 18px, 1180px);
+          padding-top: 9px;
+        }
+
+        .hero,
+        .stores,
+        .workspace {
+          padding: 14px;
+        }
+
+        .control-row,
+        .summary-grid,
+        .item-form {
+          grid-template-columns: 1fr;
+        }
+
+        .status,
+        .panel-head,
+        .detail-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .summary-grid {
+          gap: 8px;
+        }
+
+        h1 {
+          font-size: 1.74rem;
+          line-height: 1.18;
+          max-width: calc(100vw - 74px);
+          word-break: break-all;
+        }
+
+        .lead {
+          max-width: calc(100vw - 74px);
+          font-size: 0.96rem;
+        }
+
+        .hero-controls {
+          max-width: calc(100vw - 46px);
+        }
+
+        .proof-list {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+      }
+      .back-link {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(23, 33, 60, 0.08);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #243834;
+        padding: 0 12px;
+        font-size: 0.88rem;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .student-modes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .student-modes span {
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(23, 33, 60, 0.08);
+        border-radius: 8px;
+        background: #fff7ed;
+        color: #753b25;
+        padding: 0 10px;
+        font-size: 0.82rem;
+        font-weight: 900;
+      }
+
+      body {
+        background:
+          linear-gradient(135deg, rgba(255, 246, 232, 0.9) 0%, rgba(237, 250, 245, 0.92) 44%, rgba(238, 246, 255, 0.94) 100%),
+          url("https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=2200&q=78") center / cover fixed;
+      }
+
+      .app {
+        padding-top: 18px;
+      }
+
+      .hero,
+      .status,
+      .stores,
+      .workspace,
+      .metric-card,
+      .note-card {
+        border-color: rgba(23, 33, 60, 0.08);
+        background: rgba(255, 255, 255, 0.93);
+        box-shadow: 0 14px 34px rgba(20, 44, 44, 0.08);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        align-items: center;
+        grid-template-columns: minmax(0, 0.95fr) minmax(310px, 0.45fr);
+      }
+
+      .hero-controls {
+        align-self: center;
+        padding: 18px;
+        border: 1px solid rgba(23, 33, 60, 0.08);
+        border-top: 4px solid var(--coral);
+        border-radius: 8px;
+        background: rgba(249, 251, 250, 0.94);
+        box-shadow: 0 14px 34px rgba(20, 44, 44, 0.08);
+      }
+
+      .brand {
+        color: #d85e49;
+      }
+
+      .brand-mark {
+        background: linear-gradient(140deg, var(--mint), var(--coral));
+      }
+
+      h1 {
+        color: #142c2c;
+      }
+
+      .lead {
+        color: #263936;
+        font-weight: 700;
+      }
+
+      .proof-list div,
+      .metric-card {
+        background: rgba(255, 255, 255, 0.86);
+      }
+
+      .proof-list dt,
+      .metric-card strong {
+        color: #142c2c;
+      }
+
+      .btn-primary {
+        background: #142c2c;
+        box-shadow: 0 14px 30px rgba(20, 44, 44, 0.18);
+      }
+
+      .btn-primary:hover {
+        background: #0f2424;
+      }
+
+      .btn-ghost,
+      .chip {
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .chip.active,
+      .type-pill {
+        background: #fff7ed;
+        color: #753b25;
+      }
+
+      .stores,
+      .workspace {
+        border-top: 4px solid var(--mint);
+      }
+
+      .workspace {
+        border-top-color: var(--coral);
+      }
+
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .student-modes {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .student-modes span {
+          justify-content: center;
+          text-align: center;
+          white-space: normal;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="hero" aria-label="Kaimono Clock">
+        <div>
+          <div class="brand">
+            <span class="brand-mark">K</span>
+            <span>Kaimono Clock</span>
+            <a class="back-link" href="./index_ver2.html">LPへ戻る</a>
+          </div>
+          <h1>
+            <span>バイト代も</span>
+            <span>仕送りも、</span>
+            <span>ムダ買いで</span>
+            <span>減らさない。</span>
+          </h1>
+          <p class="lead">
+            <span>Kaimono Clockは、近くのお店の割引と</span>
+            <span>自分の買い物メモをひとつにします。</span>
+            <span>品物の価格とセール日を保存して、</span>
+            <span>必要なものを安いタイミングで見返せます。</span>
+          </p>
+          <div class="student-modes" aria-label="学生生活で使う場面">
+            <span>学校帰り</span>
+            <span>バイト前</span>
+            <span>ひとり暮らし</span>
+            <span>今月の予算確認</span>
+          </div>
+          <dl class="proof-list" aria-label="主なメリット">
+            <div>
+              <dt>1タップ</dt>
+              <dd>買い時を確認</dd>
+            </div>
+            <div>
+              <dt>週3分</dt>
+              <dd>生活費チェック</dd>
+            </div>
+            <div>
+              <dt>近所</dt>
+              <dd>スーパー・薬局を比較</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="hero-controls">
+          <div class="control-row">
+            <label>
+              検索範囲
+              <select id="radiusSelect">
+                <option value="800">800m</option>
+                <option value="1200" selected>1.2km</option>
+                <option value="2000">2km</option>
+                <option value="3000">3km</option>
+              </select>
+            </label>
+            <label>
+              並び順
+              <select id="sortSelect">
+                <option value="distance" selected>近い順</option>
+                <option value="name">名前順</option>
+                <option value="notes">メモが多い順</option>
+              </select>
+            </label>
+          </div>
+          <button id="locateBtn" class="btn btn-primary" type="button">近くの買い時を探す</button>
+          <button id="sampleBtn" class="btn btn-ghost" type="button">サンプルで試す</button>
+        </div>
+      </section>
+
+      <section class="status" aria-live="polite">
+        <div class="status-message">
+          <span id="statusDot" class="dot"></span>
+          <span id="statusText">位置情報を許可すると、近くのスーパーとドラッグストアから買い時候補を探します。</span>
+        </div>
+        <button id="clearAllBtn" class="btn btn-ghost" type="button">保存メモを全削除</button>
+      </section>
+
+      <section class="summary-grid" aria-label="概要">
+        <div class="metric-card">
+          <span>近くのお店</span>
+          <strong id="metricStores">0</strong>
+        </div>
+        <div class="metric-card">
+          <span>買い時メモ</span>
+          <strong id="metricNotes">0</strong>
+        </div>
+        <div class="metric-card">
+          <span>最安価格</span>
+          <strong id="metricLowest">-</strong>
+        </div>
+      </section>
+
+      <section class="main-grid">
+        <aside class="stores" aria-label="店舗一覧">
+          <div class="panel-head">
+            <div>
+              <h2>店舗</h2>
+              <p id="storeCount" class="muted">0件</p>
+            </div>
+          </div>
+          <div class="filter-row" role="tablist" aria-label="店舗種別">
+            <button class="chip active" type="button" data-filter="all">すべて</button>
+            <button class="chip" type="button" data-filter="supermarket">スーパー</button>
+            <button class="chip" type="button" data-filter="drugstore">ドラッグストア</button>
+          </div>
+          <div id="storeList" class="store-list"></div>
+        </aside>
+
+        <section class="workspace" aria-label="店舗別価格メモ">
+          <div id="emptyState" class="empty">
+            <div>
+              <h2>店舗を選択してください</h2>
+              <p>取得した店舗を選ぶと、その店舗に品物・価格・セール日を紐づけて保存できます。必要なものだけ、安い日に買うためのメモ帳です。</p>
+            </div>
+          </div>
+
+          <div id="detailView" class="hidden">
+            <div class="detail-head">
+              <div>
+                <span id="detailType" class="type-pill"></span>
+                <h2 id="detailName"></h2>
+                <p id="detailMeta" class="muted"></p>
+              </div>
+              <button id="mapBtn" class="btn btn-ghost" type="button">地図で開く</button>
+            </div>
+
+            <form id="itemForm" class="item-form">
+              <label>
+                品物
+                <input id="itemName" type="text" placeholder="例: 牛乳 1L" required />
+              </label>
+              <label>
+                価格
+                <input id="itemPrice" type="number" min="0" step="1" placeholder="198" required />
+              </label>
+              <fieldset class="sale-field">
+                <legend>セール設定</legend>
+                <div class="sale-options">
+                  <label class="schedule-label" for="saleMode">
+                    <span>周期</span>
+                    <select id="saleMode">
+                      <option value="once">単発</option>
+                      <option value="weekly">毎週</option>
+                      <option value="monthly">毎月</option>
+                    </select>
+                  </label>
+                  <label id="saleDateWrap" class="schedule-label" for="saleDate">
+                    <span>日付</span>
+                    <input id="saleDate" class="schedule-field" type="date" required />
+                  </label>
+                  <label id="saleWeekdayWrap" class="schedule-label hidden" for="saleWeekday">
+                    <span>曜日</span>
+                    <select id="saleWeekday" class="schedule-field">
+                      <option value="0">日曜日</option>
+                      <option value="1">月曜日</option>
+                      <option value="2">火曜日</option>
+                      <option value="3">水曜日</option>
+                      <option value="4">木曜日</option>
+                      <option value="5">金曜日</option>
+                      <option value="6">土曜日</option>
+                    </select>
+                  </label>
+                  <label id="saleMonthDayWrap" class="schedule-label hidden" for="saleMonthDay">
+                    <span>日にち</span>
+                    <input id="saleMonthDay" class="schedule-field" type="number" min="1" max="31" step="1" placeholder="例: 15" />
+                  </label>
+                </div>
+              </fieldset>
+              <label>
+                メモ
+                <input id="itemNote" type="text" placeholder="例: アプリ会員限定" />
+              </label>
+              <button class="btn btn-primary" type="submit">追加</button>
+            </form>
+
+            <div id="notes" class="notes"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const SUPABASE_URL = "https://wnxphjricowzxbkwnmjx.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndueHBoanJpY293enhia3dubWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MDk5ODMsImV4cCI6MjA5NzQ4NTk4M30.p6lu6gNpdkTg0Nvnxj05m2tHbYeihYP7jFPdIEWfSxo";
+      const SUPABASE_TABLE = "store_discounts";
+
+      const state = {
+        stores: [],
+        selectedStoreId: "",
+        filter: "all",
+        userPosition: null,
+        notes: {},
+      };
+
+      const sampleStores = [
+        {
+          id: "sample-supermarket-1",
+          name: "駅前サンプルスーパー",
+          type: "supermarket",
+          lat: 35.681236,
+          lon: 139.767125,
+          distance: 180,
+          address: "駅前通り 1-2-3",
+        },
+        {
+          id: "sample-drugstore-1",
+          name: "サンプルドラッグ中央店",
+          type: "drugstore",
+          lat: 35.6821,
+          lon: 139.7654,
+          distance: 360,
+          address: "中央町 4-5",
+        },
+        {
+          id: "sample-supermarket-2",
+          name: "青葉マーケット",
+          type: "supermarket",
+          lat: 35.6798,
+          lon: 139.7649,
+          distance: 620,
+          address: "青葉町 2-8",
+        },
+      ];
+
+      const elements = {
+        radiusSelect: document.querySelector("#radiusSelect"),
+        sortSelect: document.querySelector("#sortSelect"),
+        locateBtn: document.querySelector("#locateBtn"),
+        sampleBtn: document.querySelector("#sampleBtn"),
+        clearAllBtn: document.querySelector("#clearAllBtn"),
+        statusDot: document.querySelector("#statusDot"),
+        statusText: document.querySelector("#statusText"),
+        metricStores: document.querySelector("#metricStores"),
+        metricNotes: document.querySelector("#metricNotes"),
+        metricLowest: document.querySelector("#metricLowest"),
+        storeCount: document.querySelector("#storeCount"),
+        storeList: document.querySelector("#storeList"),
+        chips: document.querySelectorAll(".chip"),
+        emptyState: document.querySelector("#emptyState"),
+        detailView: document.querySelector("#detailView"),
+        detailType: document.querySelector("#detailType"),
+        detailName: document.querySelector("#detailName"),
+        detailMeta: document.querySelector("#detailMeta"),
+        mapBtn: document.querySelector("#mapBtn"),
+        itemForm: document.querySelector("#itemForm"),
+        itemName: document.querySelector("#itemName"),
+        itemPrice: document.querySelector("#itemPrice"),
+        saleMode: document.querySelector("#saleMode"),
+        saleDateWrap: document.querySelector("#saleDateWrap"),
+        saleDate: document.querySelector("#saleDate"),
+        saleWeekdayWrap: document.querySelector("#saleWeekdayWrap"),
+        saleWeekday: document.querySelector("#saleWeekday"),
+        saleMonthDayWrap: document.querySelector("#saleMonthDayWrap"),
+        saleMonthDay: document.querySelector("#saleMonthDay"),
+        itemNote: document.querySelector("#itemNote"),
+        notes: document.querySelector("#notes"),
+      };
+
+      function setStatus(mode, message) {
+        elements.statusDot.className = `dot ${mode}`;
+        elements.statusText.textContent = message;
+      }
+
+      function loadNotes() {
+        return state.notes;
+      }
+
+      function supabaseHeaders(extra = {}) {
+        return {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          ...extra,
+        };
+      }
+
+      async function supabaseRequest(path, options = {}) {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+          ...options,
+          headers: supabaseHeaders(options.headers || {}),
+        });
+        if (!response.ok) {
+          const message = await response.text();
+          throw new Error(message || `Supabase request failed: ${response.status}`);
+        }
+        if (response.status === 204) return null;
+        return response.json();
+      }
+
+      function rowToNote(row) {
+        return {
+          id: row.id,
+          storeName: row.store_name,
+          storeType: row.store_type,
+          name: row.item_name,
+          price: Number(row.price),
+          saleMode: row.sale_mode || "once",
+          saleDate: row.sale_date || "",
+          saleWeekday: row.sale_weekday == null ? "0" : String(row.sale_weekday),
+          saleMonthDay: row.sale_month_day == null ? "" : String(row.sale_month_day),
+          note: row.note || "",
+          createdAt: row.created_at ? new Date(row.created_at).toLocaleDateString("ja-JP") : "",
+        };
+      }
+
+      function noteToRow(storeId, note) {
+        return {
+          id: note.id,
+          store_id: storeId,
+          store_name: note.storeName,
+          store_type: note.storeType,
+          item_name: note.name,
+          price: note.price,
+          sale_mode: note.saleMode || "once",
+          sale_date: note.saleMode === "once" && note.saleDate ? note.saleDate : null,
+          sale_weekday: note.saleMode === "weekly" ? Number(note.saleWeekday) : null,
+          sale_month_day: note.saleMode === "monthly" ? Number(note.saleMonthDay) : null,
+          note: note.note || null,
+        };
+      }
+
+      function groupRows(rows) {
+        return rows.reduce((grouped, row) => {
+          grouped[row.store_id] = grouped[row.store_id] || [];
+          grouped[row.store_id].push(rowToNote(row));
+          return grouped;
+        }, {});
+      }
+
+      function flattenNotes(notes) {
+        return Object.entries(notes).flatMap(([storeId, items]) => items.map((item) => noteToRow(storeId, item)));
+      }
+
+      async function loadNotesFromSupabase() {
+        const rows = await supabaseRequest(`${SUPABASE_TABLE}?select=*&order=created_at.desc`);
+        state.notes = groupRows(rows || []);
+        setStatus("ready", "Supabaseから保存済みの割引情報を読み込みました。");
+      }
+
+      async function migrateLocalBackupIfEmpty() {
+        if (Object.values(state.notes).flat().length) return;
+        try {
+          const response = await fetch("./discounts.json", { cache: "no-store" });
+          if (!response.ok) return;
+          const backup = await response.json();
+          const rows = flattenNotes(backup);
+          if (!rows.length) return;
+          await supabaseRequest(SUPABASE_TABLE, {
+            method: "POST",
+            headers: { Prefer: "return=minimal" },
+            body: JSON.stringify(rows),
+          });
+          state.notes = backup;
+          setStatus("ready", "ローカルJSONの既存データをSupabaseへ移行しました。");
+        } catch {
+          setStatus("error", "Supabaseへの初回移行に失敗しました。テーブル作成SQLを確認してください。");
+        }
+      }
+
+      async function insertNoteToSupabase(storeId, note) {
+        await supabaseRequest(SUPABASE_TABLE, {
+          method: "POST",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify(noteToRow(storeId, note)),
+        });
+      }
+
+      async function deleteNoteFromSupabase(noteId) {
+        await supabaseRequest(`${SUPABASE_TABLE}?id=eq.${encodeURIComponent(noteId)}`, {
+          method: "DELETE",
+          headers: { Prefer: "return=minimal" },
+        });
+      }
+
+      async function clearNotesFromSupabase() {
+        await supabaseRequest(`${SUPABASE_TABLE}?id=not.is.null`, {
+          method: "DELETE",
+          headers: { Prefer: "return=minimal" },
+        });
+      }
+
+      function notesFor(storeId) {
+        return loadNotes()[storeId] || [];
+      }
+
+      function typeLabel(type) {
+        return type === "drugstore" ? "ドラッグストア" : "スーパー";
+      }
+
+      function formatDistance(value) {
+        if (!Number.isFinite(value)) return "距離不明";
+        return value >= 1000 ? `${(value / 1000).toFixed(1)}km` : `${Math.round(value)}m`;
+      }
+
+      function describeSaleSchedule(note) {
+        const weekdays = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+        if (note.saleMode === "weekly") {
+          return `毎週${weekdays[Number(note.saleWeekday)] || "曜日未設定"}`;
+        }
+        if (note.saleMode === "monthly") {
+          return `毎月${note.saleMonthDay || "未設定"}日`;
+        }
+        return note.saleDate || "未設定";
+      }
+
+      function syncScheduleFields() {
+        const mode = elements.saleMode.value;
+        elements.saleDateWrap.classList.toggle("hidden", mode !== "once");
+        elements.saleWeekdayWrap.classList.toggle("hidden", mode !== "weekly");
+        elements.saleMonthDayWrap.classList.toggle("hidden", mode !== "monthly");
+        elements.saleDate.required = mode === "once";
+        elements.saleWeekday.required = mode === "weekly";
+        elements.saleMonthDay.required = mode === "monthly";
+      }
+
+      function distanceMeters(fromLat, fromLon, toLat, toLon) {
+        const earth = 6371000;
+        const rad = (deg) => (deg * Math.PI) / 180;
+        const dLat = rad(toLat - fromLat);
+        const dLon = rad(toLon - fromLon);
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(rad(fromLat)) * Math.cos(rad(toLat)) * Math.sin(dLon / 2) ** 2;
+        return earth * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function makeStoreId(element, storeType) {
+        return `${storeType}-${element.type}-${element.id}`;
+      }
+
+      function normalizeStore(element, lat, lon) {
+        const tags = element.tags || {};
+        const storeLat = element.lat || element.center?.lat;
+        const storeLon = element.lon || element.center?.lon;
+        if (!Number.isFinite(storeLat) || !Number.isFinite(storeLon)) return null;
+
+        const storeType = tags.shop === "chemist" || tags.amenity === "pharmacy" ? "drugstore" : "supermarket";
+        const address = [tags["addr:city"], tags["addr:neighbourhood"], tags["addr:street"], tags["addr:housenumber"]]
+          .filter(Boolean)
+          .join(" ");
+
+        return {
+          id: makeStoreId(element, storeType),
+          name: tags.name || tags.brand || "名称未登録の店舗",
+          type: storeType,
+          lat: storeLat,
+          lon: storeLon,
+          distance: distanceMeters(lat, lon, storeLat, storeLon),
+          address: address || tags["addr:full"] || "",
+        };
+      }
+
+      async function fetchNearbyStores(lat, lon, radius) {
+        const query = `
+          [out:json][timeout:25];
+          (
+            node["shop"="supermarket"](around:${radius},${lat},${lon});
+            way["shop"="supermarket"](around:${radius},${lat},${lon});
+            relation["shop"="supermarket"](around:${radius},${lat},${lon});
+            node["shop"="chemist"](around:${radius},${lat},${lon});
+            way["shop"="chemist"](around:${radius},${lat},${lon});
+            relation["shop"="chemist"](around:${radius},${lat},${lon});
+            node["amenity"="pharmacy"](around:${radius},${lat},${lon});
+            way["amenity"="pharmacy"](around:${radius},${lat},${lon});
+            relation["amenity"="pharmacy"](around:${radius},${lat},${lon});
+          );
+          out center tags;
+        `;
+
+        const response = await fetch("https://overpass-api.de/api/interpreter", {
+          method: "POST",
+          body: new URLSearchParams({ data: query }),
+        });
+
+        if (!response.ok) throw new Error("店舗取得APIが応答しませんでした。");
+
+        const data = await response.json();
+        const unique = new Map();
+        data.elements
+          .map((element) => normalizeStore(element, lat, lon))
+          .filter(Boolean)
+          .forEach((store) => unique.set(store.id, store));
+
+        return [...unique.values()].sort((a, b) => a.distance - b.distance);
+      }
+
+      function sortedStores(stores) {
+        const sort = elements.sortSelect.value;
+        return [...stores].sort((a, b) => {
+          if (sort === "name") return a.name.localeCompare(b.name, "ja");
+          if (sort === "notes") return notesFor(b.id).length - notesFor(a.id).length;
+          return a.distance - b.distance;
+        });
+      }
+
+      function visibleStores() {
+        const filtered = state.stores.filter((store) => state.filter === "all" || store.type === state.filter);
+        return sortedStores(filtered);
+      }
+
+      function updateMetrics() {
+        const notes = Object.values(loadNotes()).flat();
+        const prices = notes.map((note) => Number(note.price)).filter(Number.isFinite);
+        elements.metricStores.textContent = state.stores.length;
+        elements.metricNotes.textContent = notes.length;
+        elements.metricLowest.textContent = prices.length ? `¥${Math.min(...prices).toLocaleString("ja-JP")}` : "-";
+      }
+
+      function renderStores() {
+        const stores = visibleStores();
+        elements.storeCount.textContent = `${stores.length}件`;
+        elements.storeList.innerHTML = "";
+
+        if (!stores.length) {
+          elements.storeList.innerHTML = '<div class="blank-row">該当する店舗がありません。</div>';
+          updateMetrics();
+          return;
+        }
+
+        stores.forEach((store) => {
+          const card = document.createElement("button");
+          const noteCount = notesFor(store.id).length;
+          card.type = "button";
+          card.className = `store-card ${store.id === state.selectedStoreId ? "active" : ""}`;
+          card.innerHTML = `
+            <span class="type-pill ${store.type}">${typeLabel(store.type)}</span>
+            <strong>${escapeHtml(store.name)}</strong>
+            <small>${formatDistance(store.distance)}${store.address ? ` ・ ${escapeHtml(store.address)}` : ""}</small>
+            <small>${noteCount}件の価格メモ</small>
+          `;
+          card.addEventListener("click", () => {
+            state.selectedStoreId = store.id;
+            render();
+          });
+          elements.storeList.appendChild(card);
+        });
+
+        updateMetrics();
+      }
+
+      function renderDetail() {
+        const store = state.stores.find((item) => item.id === state.selectedStoreId);
+        if (!store) {
+          elements.emptyState.classList.remove("hidden");
+          elements.detailView.classList.add("hidden");
+          return;
+        }
+
+        elements.emptyState.classList.add("hidden");
+        elements.detailView.classList.remove("hidden");
+        elements.detailType.textContent = typeLabel(store.type);
+        elements.detailType.className = `type-pill ${store.type}`;
+        elements.detailName.textContent = store.name;
+        elements.detailMeta.textContent = `${formatDistance(store.distance)}${store.address ? ` ・ ${store.address}` : ""}`;
+        elements.mapBtn.onclick = () => {
+          window.open(`https://www.google.com/maps/search/?api=1&query=${store.lat},${store.lon}`, "_blank", "noopener");
+        };
+
+        const notes = notesFor(store.id);
+        elements.notes.innerHTML = "";
+
+        if (!notes.length) {
+          elements.notes.innerHTML = '<div class="blank-row">この店舗にはまだ価格メモがありません。</div>';
+          return;
+        }
+
+        notes.forEach((note) => {
+          const card = document.createElement("article");
+          card.className = "note-card";
+          card.innerHTML = `
+            <div class="note-head">
+              <div>
+                <h3>${escapeHtml(note.name)}</h3>
+                <p class="muted">${escapeHtml(note.note || "メモなし")}</p>
+              </div>
+              <div class="price">¥${Number(note.price).toLocaleString("ja-JP")}</div>
+            </div>
+            <div class="note-meta">
+              <span>セール: ${escapeHtml(describeSaleSchedule(note))}</span>
+              <span>登録: ${escapeHtml(note.createdAt)}</span>
+              <button class="delete-btn" type="button">削除</button>
+            </div>
+          `;
+          card.querySelector(".delete-btn").addEventListener("click", async () => {
+            const allNotes = loadNotes();
+            allNotes[store.id] = notesFor(store.id).filter((item) => item.id !== note.id);
+            state.notes = allNotes;
+            render();
+            try {
+              await deleteNoteFromSupabase(note.id);
+              setStatus("ready", "Supabaseから割引情報を削除しました。");
+            } catch {
+              setStatus("error", "Supabaseからの削除に失敗しました。テーブル権限を確認してください。");
+            }
+          });
+          elements.notes.appendChild(card);
+        });
+      }
+
+      function render() {
+        renderStores();
+        renderDetail();
+      }
+
+      function useSample() {
+        state.stores = sampleStores;
+        state.selectedStoreId = sampleStores[0].id;
+        setStatus("ready", "サンプル店舗を表示しています。現在地取得で実データに切り替えできます。");
+        render();
+      }
+
+      elements.locateBtn.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          setStatus("error", "このブラウザは位置情報に対応していません。");
+          return;
+        }
+
+        setStatus("loading", "現在地を取得しています...");
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const radius = Number(elements.radiusSelect.value);
+            state.userPosition = { lat, lon };
+            setStatus("loading", "近くのスーパー・ドラッグストアを検索しています...");
+
+            try {
+              state.stores = await fetchNearbyStores(lat, lon, radius);
+              state.selectedStoreId = state.stores[0]?.id || "";
+              setStatus(
+                state.stores.length ? "ready" : "error",
+                state.stores.length
+                  ? `${formatDistance(radius)}圏内で${state.stores.length}件見つかりました。`
+                  : "店舗が見つかりませんでした。検索範囲を広げて再取得してください。",
+              );
+              render();
+            } catch (error) {
+              setStatus("error", `${error.message} 時間をおいて再試行してください。`);
+            }
+          },
+          () => setStatus("error", "位置情報の取得が許可されませんでした。ブラウザの設定を確認してください。"),
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 },
+        );
+      });
+
+      elements.sampleBtn.addEventListener("click", useSample);
+
+      elements.radiusSelect.addEventListener("change", () => {
+        if (state.userPosition) elements.locateBtn.click();
+      });
+
+      elements.sortSelect.addEventListener("change", render);
+      elements.saleMode.addEventListener("change", syncScheduleFields);
+
+      elements.chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          elements.chips.forEach((item) => item.classList.remove("active"));
+          chip.classList.add("active");
+          state.filter = chip.dataset.filter;
+          renderStores();
+        });
+      });
+
+      elements.itemForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const store = state.stores.find((item) => item.id === state.selectedStoreId);
+        if (!store) return;
+
+        const allNotes = loadNotes();
+        const newNote = {
+          id: crypto.randomUUID(),
+          storeName: store.name,
+          storeType: store.type,
+          name: elements.itemName.value.trim(),
+          price: Number(elements.itemPrice.value),
+          saleMode: elements.saleMode.value,
+          saleDate: elements.saleDate.value,
+          saleWeekday: elements.saleWeekday.value,
+          saleMonthDay: elements.saleMonthDay.value,
+          note: elements.itemNote.value.trim(),
+          createdAt: new Date().toLocaleDateString("ja-JP"),
+        };
+        allNotes[store.id] = [
+          newNote,
+          ...(allNotes[store.id] || []),
+        ];
+        state.notes = allNotes;
+        elements.itemForm.reset();
+        syncScheduleFields();
+        render();
+        try {
+          await insertNoteToSupabase(store.id, newNote);
+          setStatus("ready", "Supabaseへ割引情報を保存しました。");
+        } catch {
+          setStatus("error", "Supabaseへの保存に失敗しました。テーブル作成SQLとRLSポリシーを確認してください。");
+        }
+      });
+
+      elements.clearAllBtn.addEventListener("click", async () => {
+        state.notes = {};
+        render();
+        try {
+          await clearNotesFromSupabase();
+          setStatus("ready", "Supabase上の保存済み価格メモを全削除しました。");
+        } catch {
+          setStatus("error", "Supabaseの全削除に失敗しました。テーブル権限を確認してください。");
+        }
+      });
+
+      async function initializeApp() {
+        try {
+          await loadNotesFromSupabase();
+          await migrateLocalBackupIfEmpty();
+        } catch {
+          state.notes = {};
+          setStatus("error", "Supabaseから読み込めませんでした。supabase_schema.sql を実行済みか確認してください。");
+        }
+        syncScheduleFields();
+        render();
+      }
+
+      syncScheduleFields();
+      initializeApp();
+    </script>
+  </body>
+</html>
