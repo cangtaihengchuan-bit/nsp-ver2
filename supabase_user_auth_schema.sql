@@ -1,6 +1,8 @@
-create table if not exists public.store_discounts (
-  id text primary key,
-  user_id uuid references auth.users(id) on delete cascade default auth.uid(),
+create extension if not exists pgcrypto;
+
+create table if not exists public.nsp_user_discounts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
   store_id text not null,
   store_name text not null,
   store_type text not null,
@@ -14,42 +16,43 @@ create table if not exists public.store_discounts (
   created_at timestamptz not null default now()
 );
 
-alter table public.store_discounts
-  add column if not exists user_id uuid references auth.users(id) on delete cascade default auth.uid();
+create index if not exists nsp_user_discounts_user_created_idx
+  on public.nsp_user_discounts (user_id, created_at desc);
 
-alter table public.store_discounts
-  alter column user_id set default auth.uid();
+create index if not exists nsp_user_discounts_store_idx
+  on public.nsp_user_discounts (store_id);
 
-create index if not exists store_discounts_user_id_created_at_idx
-  on public.store_discounts (user_id, created_at desc);
+alter table public.nsp_user_discounts enable row level security;
 
-alter table public.store_discounts enable row level security;
+drop policy if exists "nsp users can read own discounts" on public.nsp_user_discounts;
+drop policy if exists "nsp users can insert own discounts" on public.nsp_user_discounts;
+drop policy if exists "nsp users can update own discounts" on public.nsp_user_discounts;
+drop policy if exists "nsp users can delete own discounts" on public.nsp_user_discounts;
 
-drop policy if exists "Users can read own discounts" on public.store_discounts;
-drop policy if exists "Users can insert own discounts" on public.store_discounts;
-drop policy if exists "Users can update own discounts" on public.store_discounts;
-drop policy if exists "Users can delete own discounts" on public.store_discounts;
-
-create policy "Users can read own discounts"
-  on public.store_discounts
+create policy "nsp users can read own discounts"
+  on public.nsp_user_discounts
   for select
+  to authenticated
   using (auth.uid() = user_id);
 
-create policy "Users can insert own discounts"
-  on public.store_discounts
+create policy "nsp users can insert own discounts"
+  on public.nsp_user_discounts
   for insert
+  to authenticated
   with check (auth.uid() = user_id);
 
-create policy "Users can update own discounts"
-  on public.store_discounts
+create policy "nsp users can update own discounts"
+  on public.nsp_user_discounts
   for update
+  to authenticated
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
-create policy "Users can delete own discounts"
-  on public.store_discounts
+create policy "nsp users can delete own discounts"
+  on public.nsp_user_discounts
   for delete
+  to authenticated
   using (auth.uid() = user_id);
 
 grant usage on schema public to anon, authenticated;
-grant select, insert, update, delete on public.store_discounts to authenticated;
+grant select, insert, update, delete on public.nsp_user_discounts to authenticated;
