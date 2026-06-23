@@ -62,6 +62,8 @@
       .hero,
       .status,
       .auth-panel,
+      .location-panel,
+      .discount-overview,
       .stores,
       .workspace,
       .metric-card,
@@ -303,6 +305,91 @@
 
       .auth-user {
         color: #d85e49;
+      }
+
+      .location-panel,
+      .discount-overview {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 14px;
+        padding: 18px;
+      }
+
+      .location-panel {
+        border-top: 4px solid var(--sky);
+      }
+
+      .discount-overview {
+        border-top: 4px solid var(--lemon);
+      }
+
+      .location-form {
+        display: grid;
+        grid-template-columns: minmax(140px, 1fr) minmax(110px, 0.85fr) minmax(110px, 0.85fr) auto auto;
+        gap: 10px;
+        align-items: end;
+      }
+
+      .saved-location-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 10px;
+      }
+
+      .saved-location-card {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--surface);
+      }
+
+      .saved-location-card strong,
+      .discount-main strong {
+        overflow-wrap: anywhere;
+      }
+
+      .saved-location-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+
+      .discount-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .discount-row {
+        min-width: 0;
+        display: grid;
+        grid-template-columns: minmax(170px, 1.1fr) minmax(130px, 0.85fr) minmax(88px, 0.5fr) minmax(120px, 0.75fr);
+        gap: 10px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--surface);
+      }
+
+      .discount-main,
+      .discount-sub {
+        min-width: 0;
+        display: grid;
+        gap: 3px;
+      }
+
+      .discount-row span,
+      .discount-row small {
+        overflow-wrap: anywhere;
+      }
+
+      .discount-price {
+        color: var(--coral);
+        font-weight: 950;
+        white-space: nowrap;
       }
 
       .dot {
@@ -638,6 +725,8 @@
 
         .control-row,
         .summary-grid,
+        .location-form,
+        .discount-row,
         .item-form {
           grid-template-columns: 1fr;
         }
@@ -897,6 +986,7 @@
             </label>
           </div>
           <button id="locateBtn" class="btn btn-primary" type="button">近くの買い時を探す</button>
+          <button id="savedLocationBtn" class="btn btn-ghost" type="button">登録地点から探す</button>
           <button id="sampleBtn" class="btn btn-ghost" type="button">サンプルで試す</button>
         </div>
       </section>
@@ -932,6 +1022,32 @@
         </div>
       </section>
 
+      <section id="locationPanel" class="location-panel" aria-label="登録地点から探す">
+        <div class="panel-head">
+          <div>
+            <h2>登録地点からお店を探す</h2>
+            <p class="muted">自宅や学校などを保存して、出先からでもその周辺の買い時を確認できます。</p>
+          </div>
+        </div>
+        <form id="locationForm" class="location-form">
+          <label>
+            地点名
+            <input id="locationName" type="text" placeholder="自宅 / 学校" required />
+          </label>
+          <label>
+            緯度
+            <input id="locationLat" type="number" step="0.000001" placeholder="35.681236" required />
+          </label>
+          <label>
+            経度
+            <input id="locationLon" type="number" step="0.000001" placeholder="139.767125" required />
+          </label>
+          <button class="btn btn-primary" type="submit">地点を登録</button>
+          <button id="saveCurrentLocationBtn" class="btn btn-ghost" type="button">現在地を入力</button>
+        </form>
+        <div id="savedLocations" class="saved-location-list"></div>
+      </section>
+
       <section class="summary-grid" aria-label="概要">
         <div class="metric-card">
           <span>近くのお店</span>
@@ -945,6 +1061,16 @@
           <span>最安価格</span>
           <strong id="metricLowest">-</strong>
         </div>
+      </section>
+
+      <section class="discount-overview" aria-label="保存済み割引一覧">
+        <div class="panel-head">
+          <div>
+            <h2>保存済み割引一覧</h2>
+            <p class="muted">ログイン中のユーザーが登録した割引情報だけを、店名と合わせて確認できます。</p>
+          </div>
+        </div>
+        <div id="discountList" class="discount-list"></div>
       </section>
 
       <section class="main-grid">
@@ -1042,6 +1168,7 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndueHBoanJpY293enhia3dubWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MDk5ODMsImV4cCI6MjA5NzQ4NTk4M30.p6lu6gNpdkTg0Nvnxj05m2tHbYeihYP7jFPdIEWfSxo";
       const SUPABASE_TABLE = "nsp_user_discounts";
       const SESSION_KEY = "kaimono-clock-session-v2";
+      const LOCATION_KEY_PREFIX = "kaimono-clock-locations-v2";
 
       const state = {
         stores: [],
@@ -1049,6 +1176,7 @@
         filter: "all",
         userPosition: null,
         notes: {},
+        savedLocations: [],
         session: null,
         user: null,
       };
@@ -1087,6 +1215,7 @@
         radiusSelect: document.querySelector("#radiusSelect"),
         sortSelect: document.querySelector("#sortSelect"),
         locateBtn: document.querySelector("#locateBtn"),
+        savedLocationBtn: document.querySelector("#savedLocationBtn"),
         sampleBtn: document.querySelector("#sampleBtn"),
         clearAllBtn: document.querySelector("#clearAllBtn"),
         statusDot: document.querySelector("#statusDot"),
@@ -1122,6 +1251,14 @@
         signupBtn: document.querySelector("#signupBtn"),
         logoutBtn: document.querySelector("#logoutBtn"),
         authUser: document.querySelector("#authUser"),
+        locationPanel: document.querySelector("#locationPanel"),
+        locationForm: document.querySelector("#locationForm"),
+        locationName: document.querySelector("#locationName"),
+        locationLat: document.querySelector("#locationLat"),
+        locationLon: document.querySelector("#locationLon"),
+        saveCurrentLocationBtn: document.querySelector("#saveCurrentLocationBtn"),
+        savedLocations: document.querySelector("#savedLocations"),
+        discountList: document.querySelector("#discountList"),
       };
 
       function setStatus(mode, message) {
@@ -1135,6 +1272,28 @@
 
       function hasSession() {
         return Boolean(state.session?.access_token && state.user?.id);
+      }
+
+      function locationStorageKey() {
+        return `${LOCATION_KEY_PREFIX}:${state.user?.id || "guest"}`;
+      }
+
+      function loadSavedLocations() {
+        if (!hasSession()) return [];
+        try {
+          const locations = JSON.parse(localStorage.getItem(locationStorageKey()) || "[]");
+          return Array.isArray(locations)
+            ? locations.filter((item) => item?.name && Number.isFinite(Number(item.lat)) && Number.isFinite(Number(item.lon)))
+            : [];
+        } catch {
+          localStorage.removeItem(locationStorageKey());
+          return [];
+        }
+      }
+
+      function saveSavedLocations() {
+        if (!hasSession()) return;
+        localStorage.setItem(locationStorageKey(), JSON.stringify(state.savedLocations));
       }
 
       function supabaseHeaders(extra = {}) {
@@ -1205,6 +1364,9 @@
         elements.authUser.textContent = hasSession() ? state.user.email : "未ログイン";
         elements.itemForm.querySelector("button[type='submit']").disabled = !hasSession();
         elements.clearAllBtn.disabled = !hasSession();
+        elements.locationForm.querySelectorAll("input, button").forEach((control) => {
+          control.disabled = !hasSession();
+        });
       }
 
       async function signIn(email, password) {
@@ -1212,6 +1374,7 @@
         saveSession(data);
         await loadNotesFromSupabase();
         await migrateLocalBackupIfEmpty();
+        state.savedLocations = loadSavedLocations();
         render();
         setStatus("ready", "ログインしました。保存済みの割引情報を読み込みました。");
       }
@@ -1222,6 +1385,7 @@
           saveSession(data);
           await loadNotesFromSupabase();
           await migrateLocalBackupIfEmpty();
+          state.savedLocations = loadSavedLocations();
           render();
           setStatus("ready", "アカウントを作成し、ログインしました。");
           return;
@@ -1241,6 +1405,7 @@
         }
         saveSession(null);
         state.notes = {};
+        state.savedLocations = [];
         render();
         setStatus("ready", "ログアウトしました。割引メモを使うにはログインしてください。");
       }
@@ -1571,9 +1736,113 @@
         });
       }
 
+      function renderSavedLocations() {
+        elements.savedLocations.innerHTML = "";
+
+        if (!hasSession()) {
+          elements.savedLocations.innerHTML = '<div class="blank-row">ログインすると、自宅や学校などの地点を保存できます。</div>';
+          return;
+        }
+
+        if (!state.savedLocations.length) {
+          elements.savedLocations.innerHTML = '<div class="blank-row">まだ登録地点がありません。緯度・経度を入力するか、現在地を入力して保存してください。</div>';
+          return;
+        }
+
+        state.savedLocations.forEach((location) => {
+          const card = document.createElement("article");
+          card.className = "saved-location-card";
+          card.innerHTML = `
+            <div>
+              <strong>${escapeHtml(location.name)}</strong>
+              <small class="muted">${Number(location.lat).toFixed(5)}, ${Number(location.lon).toFixed(5)}</small>
+            </div>
+            <div class="saved-location-actions">
+              <button class="btn btn-primary" type="button" data-action="search">この地点から探す</button>
+              <button class="delete-btn" type="button" data-action="delete">削除</button>
+            </div>
+          `;
+          card.querySelector('[data-action="search"]').addEventListener("click", () => {
+            searchFromPosition(Number(location.lat), Number(location.lon), location.name);
+          });
+          card.querySelector('[data-action="delete"]').addEventListener("click", () => {
+            state.savedLocations = state.savedLocations.filter((item) => item.id !== location.id);
+            saveSavedLocations();
+            renderSavedLocations();
+            setStatus("ready", "登録地点を削除しました。");
+          });
+          elements.savedLocations.appendChild(card);
+        });
+      }
+
+      function getDiscountRows() {
+        return Object.entries(loadNotes())
+          .flatMap(([storeId, notes]) => notes.map((note) => ({ storeId, ...note })))
+          .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""), "ja"));
+      }
+
+      function renderDiscountList() {
+        elements.discountList.innerHTML = "";
+
+        if (!hasSession()) {
+          elements.discountList.innerHTML = '<div class="blank-row">ログインすると、自分が登録した割引情報を一覧で確認できます。</div>';
+          return;
+        }
+
+        const rows = getDiscountRows();
+        if (!rows.length) {
+          elements.discountList.innerHTML = '<div class="blank-row">まだ割引情報がありません。店舗を選んで商品・価格・セール日を登録してください。</div>';
+          return;
+        }
+
+        rows.forEach((note) => {
+          const row = document.createElement("article");
+          row.className = "discount-row";
+          row.innerHTML = `
+            <div class="discount-main">
+              <small class="muted">店舗</small>
+              <strong>${escapeHtml(note.storeName || "店舗名なし")}</strong>
+            </div>
+            <div class="discount-sub">
+              <small class="muted">商品</small>
+              <span>${escapeHtml(note.name || "商品名なし")}</span>
+            </div>
+            <div class="discount-price">¥${Number(note.price || 0).toLocaleString("ja-JP")}</div>
+            <div class="discount-sub">
+              <small class="muted">買い時</small>
+              <span>${escapeHtml(describeSaleSchedule(note))}</span>
+              ${note.note ? `<small>${escapeHtml(note.note)}</small>` : ""}
+            </div>
+          `;
+          elements.discountList.appendChild(row);
+        });
+      }
+
+      async function searchFromPosition(lat, lon, label = "選択地点") {
+        const radius = Number(elements.radiusSelect.value);
+        state.userPosition = { lat, lon, label };
+        setStatus("loading", `${label}の周辺にあるスーパー・ドラッグストアを検索しています...`);
+
+        try {
+          state.stores = await fetchNearbyStores(lat, lon, radius);
+          state.selectedStoreId = state.stores[0]?.id || "";
+          setStatus(
+            state.stores.length ? "ready" : "error",
+            state.stores.length
+              ? `${label}から${formatDistance(radius)}以内で${state.stores.length}件見つかりました。`
+              : `${label}の周辺では店舗が見つかりませんでした。検索範囲を広げて再検索してください。`,
+          );
+          render();
+        } catch (error) {
+          setStatus("error", `${error.message} 時間をおいて再試行してください。`);
+        }
+      }
+
       function render() {
         renderStores();
         renderDetail();
+        renderSavedLocations();
+        renderDiscountList();
       }
 
       function useSample() {
@@ -1594,33 +1863,29 @@
           async (position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            const radius = Number(elements.radiusSelect.value);
-            state.userPosition = { lat, lon };
-            setStatus("loading", "近くのスーパー・ドラッグストアを検索しています...");
-
-            try {
-              state.stores = await fetchNearbyStores(lat, lon, radius);
-              state.selectedStoreId = state.stores[0]?.id || "";
-              setStatus(
-                state.stores.length ? "ready" : "error",
-                state.stores.length
-                  ? `${formatDistance(radius)}圏内で${state.stores.length}件見つかりました。`
-                  : "店舗が見つかりませんでした。検索範囲を広げて再取得してください。",
-              );
-              render();
-            } catch (error) {
-              setStatus("error", `${error.message} 時間をおいて再試行してください。`);
-            }
+            await searchFromPosition(lat, lon, "現在地");
           },
           () => setStatus("error", "位置情報の取得が許可されませんでした。ブラウザの設定を確認してください。"),
           { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 },
         );
       });
 
+      elements.savedLocationBtn.addEventListener("click", () => {
+        elements.locationPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        setStatus(
+          hasSession() ? "ready" : "error",
+          hasSession()
+            ? "登録地点を選ぶか、新しい地点を保存してください。"
+            : "登録地点を使うにはログインしてください。",
+        );
+      });
+
       elements.sampleBtn.addEventListener("click", useSample);
 
       elements.radiusSelect.addEventListener("change", () => {
-        if (state.userPosition) elements.locateBtn.click();
+        if (state.userPosition) {
+          searchFromPosition(state.userPosition.lat, state.userPosition.lon, state.userPosition.label || "選択地点");
+        }
       });
 
       elements.sortSelect.addEventListener("change", render);
@@ -1656,6 +1921,66 @@
 
       elements.logoutBtn.addEventListener("click", async () => {
         await signOut();
+      });
+
+      elements.locationForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        if (!hasSession()) {
+          setStatus("error", "登録地点を保存するにはログインしてください。");
+          return;
+        }
+
+        const name = elements.locationName.value.trim();
+        const lat = Number(elements.locationLat.value);
+        const lon = Number(elements.locationLon.value);
+        if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+          setStatus("error", "地点名、緯度、経度を確認してください。");
+          return;
+        }
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+          setStatus("error", "緯度は-90から90、経度は-180から180の範囲で入力してください。");
+          return;
+        }
+
+        const nextLocation = {
+          id: crypto.randomUUID(),
+          name,
+          lat,
+          lon,
+        };
+        state.savedLocations = [
+          nextLocation,
+          ...state.savedLocations.filter((item) => item.name !== name),
+        ].slice(0, 8);
+        saveSavedLocations();
+        elements.locationForm.reset();
+        renderSavedLocations();
+        setStatus("ready", `${name}を登録しました。`);
+      });
+
+      elements.saveCurrentLocationBtn.addEventListener("click", () => {
+        if (!hasSession()) {
+          setStatus("error", "現在地を登録地点に使うにはログインしてください。");
+          return;
+        }
+        if (!navigator.geolocation) {
+          setStatus("error", "このブラウザは位置情報に対応していません。");
+          return;
+        }
+
+        setStatus("loading", "現在地を取得しています...");
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            elements.locationLat.value = position.coords.latitude.toFixed(6);
+            elements.locationLon.value = position.coords.longitude.toFixed(6);
+            if (!elements.locationName.value.trim()) {
+              elements.locationName.value = "現在地";
+            }
+            setStatus("ready", "現在地を入力しました。地点名を調整して保存できます。");
+          },
+          () => setStatus("error", "位置情報の取得が許可されませんでした。ブラウザの設定を確認してください。"),
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 },
+        );
       });
 
       elements.itemForm.addEventListener("submit", async (event) => {
@@ -1715,6 +2040,7 @@
       async function initializeApp() {
         restoreSession();
         if (hasSession()) {
+          state.savedLocations = loadSavedLocations();
           try {
             await loadNotesFromSupabase();
             await migrateLocalBackupIfEmpty();
