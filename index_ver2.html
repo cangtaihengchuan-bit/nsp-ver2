@@ -3,112 +3,509 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kaimono Clock | 学生の買い時通知アプリ</title>
+    <title>Kaimono Clock | 学生の買い時通知と家計簿アプリ</title>
     <meta
       name="description"
-      content="学生の生活費管理、買い時通知、地図での店舗比較を分けて見られるKaimono Clockの紹介サイト。"
+      content="Kaimono Clockは、近くのお店の割引情報、買い時メモ、家計簿カレンダーをまとめて確認できる学生向けアプリです。"
     />
-    <link rel="stylesheet" href="./styles_ver2.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #dce7ef;
+        --muted: #9aa8b4;
+        --line: #303b47;
+        --mint: #9cdcfe;
+        --mint-dark: #2b6f88;
+        --coral: #75beff;
+        --paper: #151b23;
+        --panel: rgba(15, 24, 35, 0.9);
+        --shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+      }
+
+      html[data-theme="warm"] {
+        color-scheme: light;
+        --ink: #24332f;
+        --muted: #687a75;
+        --line: #f0d7ca;
+        --mint: #35b6a6;
+        --mint-dark: #ff8a6b;
+        --coral: #ffb36b;
+        --paper: #fffaf3;
+        --panel: rgba(255, 252, 247, 0.92);
+        --shadow: 0 18px 36px rgba(181, 94, 65, 0.14);
+      }
+
+      html[data-theme="white-blue"] {
+        color-scheme: light;
+        --ink: #213042;
+        --muted: #5b6f86;
+        --line: #b9d9f0;
+        --mint: #7ccdf7;
+        --mint-dark: #4aaee8;
+        --coral: #b8e6ff;
+        --paper: #f5fbff;
+        --panel: rgba(245, 251, 255, 0.92);
+        --shadow: 0 14px 34px rgba(46, 112, 158, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: "Segoe UI", "Yu Gothic UI", "Hiragino Sans", Meiryo, sans-serif;
+        background:
+          radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--mint) 18%, transparent), transparent 24rem),
+          radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--coral) 18%, transparent), transparent 22rem),
+          linear-gradient(180deg, #1e1e1e 0%, #1f252d 55%, #181c22 100%);
+      }
+
+      html[data-theme="warm"] body {
+        background:
+          radial-gradient(circle at 18% 12%, rgba(255, 138, 107, 0.18), transparent 24rem),
+          radial-gradient(circle at 88% 8%, rgba(53, 182, 166, 0.14), transparent 22rem),
+          linear-gradient(180deg, #fff4e8 0%, #fffaf3 54%, #f5fbf8 100%);
+      }
+
+      html[data-theme="white-blue"] body {
+        background:
+          radial-gradient(circle at 18% 12%, rgba(91, 184, 238, 0.2), transparent 24rem),
+          linear-gradient(180deg, #ffffff 0%, #eef8ff 55%, #f8fcff 100%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        width: min(1040px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 18px 0 32px;
+      }
+
+      .top-row,
+      .hero-panel,
+      .page-card,
+      .signal-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .top-row {
+        position: sticky;
+        top: 10px;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        font-weight: 900;
+      }
+
+      .logo {
+        display: grid;
+        flex: 0 0 48px;
+        width: 48px;
+        height: 48px;
+        place-items: center;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(140deg, var(--mint-dark), var(--coral));
+        font-weight: 900;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .nav-links a,
+      .theme-control select {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        background: var(--paper);
+        font: inherit;
+        font-weight: 900;
+      }
+
+      .nav-links a {
+        display: inline-grid;
+        place-items: center;
+        padding: 0 12px;
+      }
+
+      .nav-links .primary {
+        color: #fff;
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--mint-dark), var(--coral));
+      }
+
+      html[data-theme="white-blue"] .nav-links .primary,
+      html[data-theme="white-blue"] .primary-action {
+        color: #12344f;
+      }
+
+      .theme-control {
+        display: grid;
+        gap: 5px;
+        min-width: 132px;
+      }
+
+      .theme-control span {
+        color: var(--muted);
+        font-size: 0.76rem;
+        font-weight: 900;
+      }
+
+      .theme-control select {
+        width: 100%;
+        padding: 0 10px;
+      }
+
+      .hero-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        gap: 22px;
+        margin-top: 18px;
+        padding: clamp(18px, 4vw, 34px);
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--coral);
+        font-size: 0.82rem;
+        font-weight: 900;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 720px;
+        margin: 0;
+        font-size: clamp(2.35rem, 7vw, 5rem);
+        line-height: 1.04;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 640px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-weight: 800;
+        line-height: 1.85;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .action-card {
+        min-height: 82px;
+        display: grid;
+        align-content: center;
+        gap: 4px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        color: var(--ink);
+        background: var(--paper);
+        font-weight: 900;
+      }
+
+      .primary-action {
+        color: #fff;
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--mint-dark), var(--coral));
+      }
+
+      .action-card span {
+        opacity: 0.78;
+        font-size: 0.86rem;
+      }
+
+      .phone-preview {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: color-mix(in srgb, var(--paper) 78%, transparent);
+      }
+
+      .phone-preview h2 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .mini-card {
+        display: grid;
+        gap: 4px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--paper);
+      }
+
+      .mini-card strong {
+        font-size: 1.08rem;
+      }
+
+      .mini-card span,
+      .mini-card small {
+        color: var(--muted);
+        font-weight: 850;
+      }
+
+      .section {
+        margin-top: 18px;
+      }
+
+      .section h2 {
+        max-width: 760px;
+        margin: 0 0 14px;
+        font-size: clamp(1.7rem, 4vw, 3rem);
+        line-height: 1.12;
+      }
+
+      .page-grid,
+      .signal-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .page-card,
+      .signal-card {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+      }
+
+      .page-card strong {
+        color: var(--coral);
+        font-size: 0.9rem;
+      }
+
+      .page-card h3,
+      .signal-card h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .page-card p,
+      .signal-card p {
+        margin: 0;
+        color: var(--muted);
+        font-weight: 800;
+        line-height: 1.65;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-weight: 850;
+      }
+
+      @media (max-width: 820px) {
+        .top-row,
+        .footer {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .nav-links {
+          justify-content: stretch;
+        }
+
+        .nav-links a {
+          flex: 1 1 120px;
+        }
+
+        .hero-panel,
+        .page-grid,
+        .signal-grid,
+        .actions {
+          grid-template-columns: 1fr;
+        }
+
+        .shell {
+          width: min(420px, calc(100% - 20px));
+          padding-top: 10px;
+        }
+
+        h1 {
+          font-size: clamp(2.2rem, 12vw, 3.4rem);
+        }
+      }
+    </style>
   </head>
   <body>
-    <header class="site-header">
-      <a class="brand" href="./index_ver2.html" aria-label="Kaimono Clock トップへ">
-        <span class="brand-mark">K</span>
+    <div class="shell">
+      <header class="top-row">
+        <a class="brand" href="./index_ver2.html" aria-label="Kaimono Clock トップへ">
+          <span class="logo">K</span>
+          <strong>Kaimono Clock</strong>
+        </a>
+        <label class="theme-control">
+          <span>カラー</span>
+          <select data-theme-select aria-label="テーマカラー">
+            <option value="warm">暖色</option>
+            <option value="cool">寒色</option>
+            <option value="white-blue">白青</option>
+          </select>
+        </label>
+        <nav class="nav-links" aria-label="主要ナビゲーション">
+          <a href="./budget.html">家計簿</a>
+          <a href="./map.html">地図</a>
+          <a href="./alerts.html">通知</a>
+          <a href="./items.html">買い物例</a>
+          <a class="primary" href="./app.html">デモを体験</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero-panel" aria-label="Kaimono Clock">
+          <div>
+            <p class="eyebrow">Student shopping assistant</p>
+            <h1>買い時と家計を、ひとつの体験で。</h1>
+            <p class="lead">
+              近くのお店の割引メモを保存し、同じ情報を家計簿カレンダーでも確認できます。
+              スマホからすぐ開けて、必要なものと残り予算を軽く見直せます。
+            </p>
+            <div class="actions">
+              <a class="action-card primary-action" href="./app.html">
+                買い時メモを開く
+                <span>お店別の割引情報を登録</span>
+              </a>
+              <a class="action-card" href="./budget.html">
+                家計簿機能を見る
+                <span>支出と残り予算を確認</span>
+              </a>
+              <a class="action-card" href="./map.html">
+                近くのお店を探す
+                <span>学校・駅・家の近くを比較</span>
+              </a>
+              <a class="action-card" href="./alerts.html">
+                通知の仕組みを見る
+                <span>なくなる前と安い日を見逃さない</span>
+              </a>
+            </div>
+          </div>
+
+          <aside class="phone-preview" aria-label="アプリ画面イメージ">
+            <h2>今日の買い時</h2>
+            <div class="mini-card">
+              <span>放課後に寄れる店</span>
+              <strong>駅前スーパー / 学校帰り</strong>
+              <small>牛乳 ¥178、7/6まで</small>
+            </div>
+            <div class="mini-card">
+              <span>家計簿カレンダー</span>
+              <strong>買い時 牛乳</strong>
+              <small>支出予定と一緒に確認</small>
+            </div>
+            <div class="mini-card">
+              <span>今月の残り予算</span>
+              <strong>¥18,400</strong>
+              <small>買う前に使える金額を見直し</small>
+            </div>
+          </aside>
+        </section>
+
+        <section class="section" aria-label="機能ページ">
+          <p class="eyebrow">Pages</p>
+          <h2>機能ごとに読めて、最後はそのまま体験できます。</h2>
+          <div class="page-grid">
+            <a class="page-card" href="./budget.html">
+              <strong>01</strong>
+              <h3>家計簿機能</h3>
+              <p>支出、収入、月の予算を見ながら、買い物のタイミングを考えられます。</p>
+            </a>
+            <a class="page-card" href="./map.html">
+              <strong>02</strong>
+              <h3>地図機能</h3>
+              <p>現在地だけでなく、家や学校の近くのお店も探せます。</p>
+            </a>
+            <a class="page-card" href="./alerts.html">
+              <strong>03</strong>
+              <h3>買い時通知</h3>
+              <p>必要なもの、なくなりそうなもの、安くなる日をまとめて見逃しにくくします。</p>
+            </a>
+            <a class="page-card" href="./items.html">
+              <strong>04</strong>
+              <h3>買い物例</h3>
+              <p>食品、日用品、学校用品など、学生生活で使いやすい例を確認できます。</p>
+            </a>
+          </div>
+        </section>
+
+        <section class="section" aria-label="学生生活での使い方">
+          <p class="eyebrow">Use cases</p>
+          <div class="signal-grid">
+            <div class="signal-card">
+              <h3>バイト前</h3>
+              <p>寄り道できる店だけ見て、必要なものを短時間で買えます。</p>
+            </div>
+            <div class="signal-card">
+              <h3>学校帰り</h3>
+              <p>学校近く、駅前、家の近くを分けて考えられます。</p>
+            </div>
+            <div class="signal-card">
+              <h3>一人暮らし</h3>
+              <p>食費や日用品の買い時を、月の予算と一緒に確認できます。</p>
+            </div>
+            <div class="signal-card">
+              <h3>まとめ買い</h3>
+              <p>単発、毎週、毎月、期間割引のメモを残せます。</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
         <span>Kaimono Clock</span>
-      </a>
-      <nav class="nav-links" aria-label="主要ナビゲーション">
-        <a aria-current="page" href="./index_ver2.html">ホーム</a>
-        <a href="./budget.html">家計簿</a>
-        <a href="./map.html">地図</a>
-        <a href="./alerts.html">通知</a>
-        <a href="./items.html">買い物例</a>
-      </nav>
-      <a class="header-cta app-cta" href="./app.html">アプリを体験</a>
-    </header>
+        <span>学生の買い時通知と生活費管理をひとつに。</span>
+      </footer>
+    </div>
 
-    <main class="page-shell">
-      <section class="hero">
-        <div>
-          <p class="eyebrow">Version 2 / Multi page</p>
-          <h1>
-            <span>必要なものを</span>
-            <span>安い日に買う。</span>
-          </h1>
-          <p class="lead">
-            Kaimono Clockは、学生の生活費を守る買い物アプリです。
-            バイト代や仕送りをムダ買いで減らさないように、家計簿・地図・通知を別ページで分かりやすく整理しました。
-          </p>
-          <div class="hero-actions">
-            <a class="secondary-btn" href="./budget.html">家計簿機能</a>
-            <a class="secondary-btn" href="./map.html">近くの店を検索できる</a>
-            <a class="primary-btn app-cta" href="./app.html">アプリを体験してみる</a>
-          </div>
-          <div class="student-context" aria-label="学生生活で使う場面">
-            <span>放課後に寄れる店</span>
-            <span>バイト前の買い足し</span>
-            <span>今月の残り予算</span>
-          </div>
-        </div>
-
-        <div class="phone-frame" aria-label="アプリ画面イメージ">
-          <div class="phone-top">
-            <span>今日の買い時</span>
-            <strong>放課後 17:30</strong>
-          </div>
-          <div class="mini-card highlight">
-            <span>買い時通知</span>
-            <h3>明日の朝食用に、冷凍パスタが安いです</h3>
-            <small>駅前ドラッグで本日19時まで30円OFF</small>
-          </div>
-          <div class="mini-card active">
-            <span>買うなら今日</span>
-            <strong>冷凍パスタ 2食分</strong>
-            <small>駅前ドラッグ ¥348</small>
-          </div>
-          <div class="mini-card">
-            <span>あと2日</span>
-            <strong>コンタクト洗浄液</strong>
-            <small>キャンパス前薬局 ¥498</small>
-          </div>
-          <div class="mini-card">
-            <span>今月あと使える金額</span>
-            <strong>¥18,400</strong>
-            <small>買い時セーブ ¥2,180</small>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-label="ページ一覧">
-        <p class="section-kicker">Pages</p>
-        <h2>なくなる前に、近くで安く。生活費までまとめて見える。</h2>
-        <div class="page-grid">
-          <a class="page-card" href="./budget.html">
-            <strong>01</strong>
-            <h3>家計簿機能</h3>
-            <p>バイト代、仕送り、食費、日用品、サブスクをまとめて確認するページ。</p>
-          </a>
-          <a class="page-card" href="./map.html">
-            <strong>02</strong>
-            <h3>地図機能</h3>
-            <p>学校、駅、家の近くにある店舗と、寄り道しやすいルートを見るページ。</p>
-          </a>
-          <a class="page-card" href="./alerts.html">
-            <strong>03</strong>
-            <h3>買い時通知</h3>
-            <p>なくなりそうなものと割引情報を組み合わせて通知する仕組みのページ。</p>
-          </a>
-          <a class="page-card" href="./items.html">
-            <strong>04</strong>
-            <h3>買い物例</h3>
-            <p>冷凍食品、コンタクト用品、コスメ、文房具など学生向けの商品例。</p>
-          </a>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <span>Kaimono Clock</span>
-      <span>学生の買い時通知と生活費管理をひとつに。</span>
-    </footer>
+    <script>
+      const THEME_KEY = "kaimono-clock-theme";
+      const theme = localStorage.getItem(THEME_KEY) || "cool";
+      document.documentElement.dataset.theme = theme;
+      document.querySelectorAll("[data-theme-select]").forEach((select) => {
+        select.value = theme;
+        select.addEventListener("change", () => {
+          localStorage.setItem(THEME_KEY, select.value);
+          document.documentElement.dataset.theme = select.value;
+        });
+      });
+    </script>
   </body>
 </html>
