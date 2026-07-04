@@ -10,42 +10,16 @@
     />
     <style>
       :root {
-        color-scheme: dark;
-        --ink: #dce7ef;
-        --muted: #9aa8b4;
-        --line: #303b47;
-        --mint: #9cdcfe;
-        --mint-dark: #2b6f88;
-        --coral: #75beff;
-        --paper: #151b23;
-        --panel: rgba(15, 24, 35, 0.9);
-        --shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
-      }
-
-      html[data-theme="warm"] {
         color-scheme: light;
-        --ink: #24332f;
-        --muted: #687a75;
-        --line: #f0d7ca;
+        --ink: #2d211d;
+        --muted: #765f57;
+        --line: #efd8cc;
         --mint: #35b6a6;
-        --mint-dark: #ff8a6b;
+        --mint-dark: #d85e49;
         --coral: #ffb36b;
-        --paper: #fffaf3;
+        --paper: #fff8ef;
         --panel: rgba(255, 252, 247, 0.92);
         --shadow: 0 18px 36px rgba(181, 94, 65, 0.14);
-      }
-
-      html[data-theme="white-blue"] {
-        color-scheme: light;
-        --ink: #213042;
-        --muted: #5b6f86;
-        --line: #b9d9f0;
-        --mint: #7ccdf7;
-        --mint-dark: #4aaee8;
-        --coral: #b8e6ff;
-        --paper: #f5fbff;
-        --panel: rgba(245, 251, 255, 0.92);
-        --shadow: 0 14px 34px rgba(46, 112, 158, 0.16);
       }
 
       * {
@@ -58,22 +32,9 @@
         color: var(--ink);
         font-family: "Segoe UI", "Yu Gothic UI", "Hiragino Sans", Meiryo, sans-serif;
         background:
-          radial-gradient(circle at 18% 12%, rgba(156, 220, 254, 0.13), transparent 24rem),
-          radial-gradient(circle at 88% 8%, rgba(117, 190, 255, 0.16), transparent 22rem),
-          linear-gradient(180deg, #1e1e1e 0%, #1f252d 55%, #181c22 100%);
-      }
-
-      html[data-theme="warm"] body {
-        background:
-          radial-gradient(circle at 18% 12%, rgba(255, 138, 107, 0.18), transparent 24rem),
-          radial-gradient(circle at 88% 8%, rgba(53, 182, 166, 0.14), transparent 22rem),
-          linear-gradient(180deg, #fff4e8 0%, #fffaf3 54%, #f5fbf8 100%);
-      }
-
-      html[data-theme="white-blue"] body {
-        background:
-          radial-gradient(circle at 18% 12%, rgba(91, 184, 238, 0.2), transparent 24rem),
-          linear-gradient(180deg, #ffffff 0%, #eef8ff 55%, #f8fcff 100%);
+          radial-gradient(circle at 16% 10%, rgba(255, 127, 95, 0.22), transparent 26rem),
+          radial-gradient(circle at 88% 8%, rgba(255, 211, 122, 0.2), transparent 24rem),
+          linear-gradient(180deg, #fff1e7 0%, #fff8ef 54%, #f6fbf7 100%);
       }
 
       a {
@@ -157,11 +118,6 @@
         color: #fff;
         border-color: transparent;
         background: linear-gradient(135deg, var(--mint-dark), var(--coral));
-      }
-
-      html[data-theme="white-blue"] .nav-links .primary,
-      html[data-theme="white-blue"] .primary-action {
-        color: #12344f;
       }
 
       .hero-panel {
