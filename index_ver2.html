@@ -48,7 +48,7 @@
         padding: 18px 0 32px;
       }
 
-      .top-row,
+      .site-header,
       .hero-panel,
       .page-card,
       .signal-card {
@@ -59,7 +59,7 @@
         backdrop-filter: blur(14px);
       }
 
-      .top-row {
+      .site-header {
         position: sticky;
         top: 10px;
         z-index: 5;
@@ -78,7 +78,7 @@
         font-weight: 900;
       }
 
-      .logo {
+      .brand-mark {
         display: grid;
         flex: 0 0 48px;
         width: 48px;
@@ -118,6 +118,22 @@
         color: #fff;
         border-color: transparent;
         background: linear-gradient(135deg, var(--mint-dark), var(--coral));
+      }
+
+      .header-cta {
+        min-height: 38px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .app-cta {
+        color: #fff;
+        border: 1px solid transparent;
+        background: linear-gradient(135deg, var(--mint-dark), #ff8f6a);
       }
 
       .hero-panel {
@@ -272,7 +288,7 @@
       }
 
       @media (max-width: 820px) {
-        .top-row,
+        .site-header,
         .footer {
           align-items: stretch;
           flex-direction: column;
@@ -306,18 +322,19 @@
   </head>
   <body>
     <div class="shell">
-      <header class="top-row">
+      <header class="site-header">
         <a class="brand" href="./index_ver2.html" aria-label="Kaimono Clock トップへ">
-          <span class="logo">K</span>
+          <span class="brand-mark">K</span>
           <strong>Kaimono Clock</strong>
         </a>
         <nav class="nav-links" aria-label="主要ナビゲーション">
+          <a aria-current="page" href="./index_ver2.html">ホーム</a>
           <a href="./budget.html">家計簿</a>
           <a href="./map.html">地図</a>
           <a href="./alerts.html">通知</a>
           <a href="./items.html">買い物例</a>
-          <a class="primary" href="./app.html">デモを体験</a>
         </nav>
+        <a class="header-cta app-cta" href="./app.html">アプリを体験</a>
       </header>
 
       <main>
