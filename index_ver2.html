@@ -137,8 +137,7 @@
         justify-content: flex-end;
       }
 
-      .nav-links a,
-      .theme-control select {
+      .nav-links a {
         min-height: 38px;
         border: 1px solid var(--line);
         border-radius: 8px;
@@ -163,23 +162,6 @@
       html[data-theme="white-blue"] .nav-links .primary,
       html[data-theme="white-blue"] .primary-action {
         color: #12344f;
-      }
-
-      .theme-control {
-        display: grid;
-        gap: 5px;
-        min-width: 132px;
-      }
-
-      .theme-control span {
-        color: var(--muted);
-        font-size: 0.76rem;
-        font-weight: 900;
-      }
-
-      .theme-control select {
-        width: 100%;
-        padding: 0 10px;
       }
 
       .hero-panel {
@@ -373,14 +355,6 @@
           <span class="logo">K</span>
           <strong>Kaimono Clock</strong>
         </a>
-        <label class="theme-control">
-          <span>カラー</span>
-          <select data-theme-select aria-label="テーマカラー">
-            <option value="warm">暖色</option>
-            <option value="cool">寒色</option>
-            <option value="white-blue">白青</option>
-          </select>
-        </label>
         <nav class="nav-links" aria-label="主要ナビゲーション">
           <a href="./budget.html">家計簿</a>
           <a href="./map.html">地図</a>
@@ -440,8 +414,8 @@
         </section>
 
         <section class="section" aria-label="機能ページ">
-          <p class="eyebrow">Pages</p>
-          <h2>機能ごとに読めて、最後はそのまま体験できます。</h2>
+          <p class="eyebrow">機能紹介</p>
+          <h2>買い時を逃さず、生活費も一緒に見直せます。</h2>
           <div class="page-grid">
             <a class="page-card" href="./budget.html">
               <strong>01</strong>
@@ -467,7 +441,7 @@
         </section>
 
         <section class="section" aria-label="学生生活での使い方">
-          <p class="eyebrow">Use cases</p>
+          <p class="eyebrow">利用シーン</p>
           <div class="signal-grid">
             <div class="signal-card">
               <h3>バイト前</h3>
@@ -495,17 +469,5 @@
       </footer>
     </div>
 
-    <script>
-      const THEME_KEY = "kaimono-clock-theme";
-      const theme = localStorage.getItem(THEME_KEY) || "cool";
-      document.documentElement.dataset.theme = theme;
-      document.querySelectorAll("[data-theme-select]").forEach((select) => {
-        select.value = theme;
-        select.addEventListener("change", () => {
-          localStorage.setItem(THEME_KEY, select.value);
-          document.documentElement.dataset.theme = select.value;
-        });
-      });
-    </script>
   </body>
 </html>
